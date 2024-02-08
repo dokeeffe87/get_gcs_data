@@ -51,7 +51,7 @@ def save_file(df, save_path=None, output_filename=None) -> bool:
             file_name = output_filename
 
     save_path = os.path.join(save_path, file_name)
-    df.to_csv(save_path)
+    df.to_csv(save_path, index=False)
 
     # Verify that the file exists
     verify_ = os.path.isfile(save_path)
