@@ -63,7 +63,7 @@ def save_file(df, save_path=None, output_filename=None) -> bool:
     return True
 
 
-def read_from_gcs(path_to_gcs_data: str, file_type: str = 'csv', save_path: str = None, output_filename: str = None, date_columns: tuple = ()) -> pd.DataFrame:
+def read_from_gcs(path_to_gcs_data: str, file_type: str = 'csv', save_path: str = None, output_filename: str = None, date_columns: tuple = (), custom_dtypes: dict = {}) -> pd.DataFrame:
     """
     Function to read data from Google Cloud Storage (GCS).  Currently, only supports csv files. You can read multiple csv files from the same GCS directory by just
     passing the directory name to path_to_gcs_data, all files will read in as one DataFrame object
@@ -75,6 +75,9 @@ def read_from_gcs(path_to_gcs_data: str, file_type: str = 'csv', save_path: str 
                             it will be added for you automatically.  If you don't supply a value here, the file will be saved as read_from_gcs_on_{CURRENT_TIME}.csv
     :param date_columns: Optional tuple of column names that contain date/datetime/timestamp data types. These need to be processed separately or else they won't be read c
                          correctly
+    :param custom_dtypes: Optional dictionary with additional dtype requirements. Sometimes Dask's internal dtype inference fails, and we can't convert the read data table to a
+                          Pandas DataFrame. Specifying the dtypes of the failing columns might fix the issue. If you add date columns here, the dtype will default to this type and
+                          ignore the column name in the date_columns variable
     :return: A pandas DataFrame with the read data
     """
 
@@ -87,6 +90,8 @@ def read_from_gcs(path_to_gcs_data: str, file_type: str = 'csv', save_path: str 
         path_to_gcs_data = path_to_gcs_data + '/*.{0}'.format(file_type)
     else:
         path_to_gcs_data = path_to_gcs_data + '*.{0}'.format(file_type)
+
+    dtypes_dict = dtypes_dict | custom_dtypes
 
     # Read data:
     print("Reading data as: {0}".format(path_to_gcs_data))
